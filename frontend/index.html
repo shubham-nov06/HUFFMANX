@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>HuffmanX — Compression Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="noise"></div>
+    <aside class="sidebar"><a class="brand" href="#"><span class="brandmark">H<span>×</span></span><span>HUFFMAN<span
+                    class="branddim">X</span><small>COMPRESSION LAB</small></span></a>
+        <div class="navlabel">WORKSPACE</div><button class="nav active" data-tab="compress"><i>◈</i> Compress
+            <b>01</b></button><button class="nav" data-tab="restore"><i>↗</i> Restore file</button><button class="nav"
+            data-tab="algorithms"><i>⌘</i> Algorithms</button><button class="nav" data-tab="visualizer"><i>⌁</i> DSA
+            Visualizer</button><button class="nav" data-tab="compare"><i>⇄</i> Compare</button><button class="nav"
+            data-tab="history"><i>◷</i> History</button><button class="nav" data-tab="files"><i>▤</i> File
+            manager</button><button class="nav" data-tab="analytics"><i>▥</i> Analytics</button><button class="nav"
+            data-tab="settings"><i>⚙</i> Settings</button><button class="nav" data-tab="about"><i>ⓘ</i> About</button>
+        <div class="sidebottom">
+            <div class="server"><span class="pulse" id="pulse"></span><span><b id="apiStatus">Connecting</b><small>LOCAL
+                        ENGINE</small></span></div><a href="http://127.0.0.1:8000/docs" target="_blank">API
+                documentation ↗</a><small class="version">HUFFMANX / v3.0</small>
+        </div>
+    </aside>
+    <main class="main">
+        <header>
+            <div class="crumb">WORKSPACE <span>/</span> <b id="crumb">COMPRESS</b></div>
+            <div class="topright"><span class="secure">⌑ LOCAL PROCESSING</span><button class="themeToggle"
+                    id="themeToggle" aria-label="Toggle theme">☼ THEME</button>
+                <div class="avatar">HX</div>
+            </div>
+        </header>
+        <section class="intro">
+            <div class="kicker"><span></span> LOSSLESS FILE ENGINE · BUILT FOR EVERY BYTE</div>
+            <h1>Make room for<br><em>what matters.</em></h1>
+            <p>Compress files with classic algorithms. Restore them byte-for-byte. No cloud upload, no format
+                conversion, no lost data.</p>
+            <div class="pills">
+                <span>HUFFMAN</span><span>RLE</span><span>LZ77</span><span>LZW</span><span>DEFLATE</span><span>SHA-256
+                    VERIFIED</span></div>
+        </section>
+        <section id="compress" class="view">
+            <div class="sectiontitle">
+                <div><label>01 / INPUT</label>
+                    <h2>Compression workspace</h2>
+                </div><span class="hint">Files up to 100 MB</span>
+            </div>
+            <div class="grid">
+                <div class="card uploadcard">
+                    <div class="cardtop"><span>SELECT YOUR FILE</span><span class="step">01</span></div><label
+                        class="drop" id="drop"><input type="file" id="file"><span class="uploadicon">↑</span><b>Drop a
+                            file here</b><span>or <u>browse files</u> from your device</span><small>Documents · Images ·
+                            Audio · Video · Archives · Code</small></label>
+                    <div class="filepicked" id="picked">No file selected</div><button class="download" id="analyzeBtn"
+                        disabled>Analyze file & recommend algorithm</button>
+                    <div id="analyzeOutput" class="fine"></div>
+                    <div id="previewOutput" class="fine"></div>
+                    <div class="algorow"><label for="algorithm">COMPRESSION ALGORITHM</label><select id="algorithm">
+                            <option value="auto">Auto — choose smallest output</option>
+                            <option value="huffman">Huffman Coding</option>
+                            <option value="rle">Run-Length Encoding</option>
+                            <option value="lz77">LZ77 Sliding Window</option>
+                            <option value="lzw">LZW Dictionary</option>
+                            <option value="deflate">DEFLATE (zlib)</option>
+                        </select></div><button class="primary" id="compressBtn" disabled>Compress file
+                        <span>↗</span></button>
+                    <div id="jobPanel" class="jobPanel" hidden>
+                        <div class="jobTop"><b id="jobMessage">Preparing job…</b><span id="jobPercent">0%</span></div>
+                        <div class="jobProgress"><i id="jobProgressFill"></i></div><small id="jobStage">Queued</small>
+                        <div class="jobControls"><button id="jobPause">Ⅱ Pause</button><button id="jobResume" disabled>▶
+                                Resume</button><button id="jobCancel">✕ Cancel</button></div>
+                    </div>
+                    <div class="batchPanel"><label for="batchFiles">BATCH / FOLDER COMPRESSION · UP TO 500 FILES / 100
+                            MB</label><input id="batchFiles" type="file" multiple webkitdirectory directory><input
+                            id="bundlePassword" type="password" minlength="8"
+                            placeholder="Optional bundle password (8+ characters)">
+                        <div id="batchDrop" class="batchDrop" tabindex="0"><b>Drop files or multiple folders
+                                here</b><span>Folder hierarchy is preserved. You can drop several folders
+                                together.</span></div><button class="download" id="batchBtn">Compress selected batch to
+                            .hfxzip</button><small id="batchStatus" class="fine"></small>
+                    </div>
+                    <p class="fine">Your file is processed by the local backend. It is not sent to a third-party
+                        service.</p>
+                </div>
+                <div class="card resultcard">
+                    <div class="cardtop"><span>OUTPUT / ANALYSIS</span><span class="step">02</span></div>
+                    <div id="empty" class="empty">
+                        <div class="emptyglyph">◌</div><b>Waiting for your file</b><span>Compression metrics and
+                            download appear here.</span>
+                    </div>
+                    <div id="result" hidden>
+                        <div class="success"><span>✓</span>
+                            <div><b>Compression complete</b><small id="resultName"></small></div>
+                        </div>
+                        <div class="metricgrid">
+                            <div><small>ORIGINAL SIZE</small><b id="original">—</b></div>
+                            <div><small>OUTPUT SIZE</small><b id="compressed">—</b></div>
+                            <div><small>SPACE SAVED</small><b id="saved">—</b></div>
+                            <div><small>ALGORITHM</small><b id="usedAlgo">—</b></div>
+                        </div>
+                        <div class="barlabel"><span>SIZE COMPARISON</span><span id="ratio">—</span></div>
+                        <div class="bar"><i id="barfill"></i></div><button class="download" id="download">↓ Download
+                            .hfx file</button>
+                        <div class="checksum"><small>SHA-256 ORIGINAL CHECKSUM</small><code id="checksum"></code></div>
+                        <p class="fine" id="note"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="restore" class="view" hidden>
+            <div class="sectiontitle">
+                <div><label>02 / RESTORE</label>
+                    <h2>Recover the original</h2>
+                </div>
+            </div>
+            <div class="card restorecard">
+                <div class="restoreintro">
+                    <div class="restoreicon">↙</div>
+                    <div>
+                        <h3>Decompress a HuffmanX archive</h3>
+                        <p>Choose a <b>.hfx</b> file created by HuffmanX. The restored file is checksum-verified before
+                            download.</p>
+                    </div>
+                </div><label class="drop compact"><input type="file" id="restoreFile"
+                        accept=".hfx,application/octet-stream"><b id="restoreName">Choose a .hfx file</b><span>Browse
+                        from your device</span></label><button class="primary" id="restoreBtn" disabled>Restore original
+                    <span>↗</span></button>
+                <div id="restoreStatus" class="restorestatus"></div>
+                <hr>
+                <div class="restoreintro">
+                    <div class="restoreicon">▦</div>
+                    <div>
+                        <h3>Restore a complete folder bundle</h3>
+                        <p>Choose a <b>.hfxzip</b> created by HuffmanX. All files are restored into a ZIP with their
+                            original subfolder structure and SHA-256 checks verified.</p>
+                    </div>
+                </div><label class="drop compact"><input type="file" id="restoreBatchFile"
+                        accept=".hfxzip,.hfxlock,.zip,application/zip"><input id="restoreBatchPassword" type="password"
+                        placeholder="Bundle password, if protected"><b id="restoreBatchName">Choose a HuffmanX folder
+                        bundle</b><span>Browse from your device</span></label><button class="download"
+                    id="restoreBatchBtn" disabled>Restore entire folder bundle ↓</button>
+                <div id="restoreBatchStatus" class="restorestatus"></div>
+                <hr>
+                <div class="restoreintro">
+                    <div class="restoreicon">≋</div>
+                    <div>
+                        <h3>Original vs restored integrity check</h3>
+                        <p>Compare two files byte-for-byte and by SHA-256 digest.</p>
+                    </div>
+                </div>
+                <div class="integrityInputs"><label>Original file<input type="file"
+                            id="integrityOriginal"></label><label>Restored file<input type="file"
+                            id="integrityRestored"></label></div>
+                <button class="download" id="integrityBtn">Compare integrity</button>
+                <div id="integrityStatus" class="restorestatus"></div>
+            </div>
+        </section>
+        <section id="algorithms" class="view" hidden>
+            <div class="sectiontitle">
+                <div><label>03 / ENGINE</label>
+                    <h2>Five ways to compress</h2>
+                </div>
+            </div>
+            <div class="algoCards">
+                <article class="card"><span class="algoNum">01</span>
+                    <h3>Huffman Coding</h3>
+                    <p>Frequency-based prefix coding built with a min-heap and binary tree.</p><small>GREEDY · PREFIX
+                        CODE</small>
+                </article>
+                <article class="card"><span class="algoNum">02</span>
+                    <h3>Run-Length Encoding</h3>
+                    <p>Stores consecutive repeated bytes as count-and-value pairs.</p><small>RUN LENGTH · SIMPLE</small>
+                </article>
+                <article class="card"><span class="algoNum">03</span>
+                    <h3>LZW</h3>
+                    <p>Builds a dynamic dictionary of repeated byte sequences.</p><small>DICTIONARY · ADAPTIVE</small>
+                </article>
+                <article class="card"><span class="algoNum">04</span>
+                    <h3>LZ77</h3>
+                    <p>Finds repeated byte sequences in a sliding window and emits distance-length references.</p>
+                    <small>SLIDING WINDOW · DICTIONARY</small>
+                </article>
+                <article class="card"><span class="algoNum">05</span>
+                    <h3>DEFLATE</h3>
+                    <p>General-purpose compression using the zlib DEFLATE implementation.</p><small>DEFLATE ·
+                        ZLIB</small>
+                </article>
+            </div>
+            <div class="callout"><b>Auto mode</b><span>Runs the available encoders and selects the smallest resulting
+                    payload for the current file. It never assumes every file will shrink.</span></div>
+        </section>
+        <section id="visualizer" class="view" hidden>
+            <div class="sectiontitle">
+                <div><label>04 / DSA LAB</label>
+                    <h2>Huffman tree explorer</h2>
+                </div><span class="hint">Upload a file in the workspace first</span>
+            </div>
+            <div class="card">
+                <div class="cardtop"><span>FREQUENCY TABLE & TREE BUILD</span><span class="step">LIVE DATA</span></div>
+                <button class="primary" id="visualizeBtn">Visualize selected file ↗</button>
+                <div id="visualOutput" class="visualOutput">Select a file in Compress, then generate its frequency
+                    table, merge sequence and prefix codes.</div>
+            </div>
+        </section>
+        <section id="compare" x class="view" hidden>
+            <div class="sectiontitle">
+                <div><label>05 / ALGORITHM LAB</label>
+                    <h2>Benchmark the algorithms</h2>
+                </div>
+            </div>
+            <div class="card">
+                <p class="fine">Compare actual output sizes for the selected input. Results include the HuffmanX
+                    container overhead.</p><button class="primary" id="compareBtn">Compare algorithms ↗</button><button
+                    class="download" id="benchmarkBtn">Run speed + memory benchmark</button>
+                <div id="benchmarkOutput" class="compareOutput"></div>
+                <div id="compareOutput" class="compareOutput"></div>
+            </div>
+        </section>
+        <section id="history" class="view" hidden>
+            <div class="sectiontitle">
+                <div><label>06 / ACTIVITY</label>
+                    <h2>Local compression history</h2>
+                </div><button class="download" id="clearHistory">Clear history</button>
+            </div>
+            <div class="card" id="historyOutput">No compression activity yet. Completed runs appear here in this
+                browser.</div>
+        </section>
+        <section id="files" class="view" hidden>
+            <div class="sectiontitle">
+                <div><label>07 / FILES</label>
+                    <h2>Recent file activity</h2>
+                </div>
+            </div>
+            <div class="card" id="fileManagerOutput">Files appear here after compression. File contents are not
+                retained.</div>
+        </section>
+        <section id="analytics" class="view" hidden>
+            <div class="sectiontitle">
+                <div><label>08 / INSIGHTS</label>
+                    <h2>Compression analytics</h2>
+                </div>
+            </div>
+            <div class="card" id="analyticsOutput">Complete a compression to build local analytics.</div>
+            <div class="card chartCard">
+                <h3>Compression activity</h3><canvas id="analyticsChart" height="150"></canvas>
+                <div id="analyticsBreakdown"></div>
+            </div>
+            <div class="card storageCalc">
+                <h3>Storage savings calculator</h3>
+                <p class="fine">Estimate net space change using a measured result from your recent compression history.
+                </p>
+                <div class="calcGrid"><label>File size (MB)<input id="calcSize" type="number" min="0" step="0.1"
+                            value="100"></label><label>Measured saving (%)<input id="calcSaved" type="number"
+                            min="-1000" max="99.9" step="0.1" value="0"></label><label>Number of copies<input
+                            id="calcCopies" type="number" min="1" max="100000" step="1" value="1"></label></div><button
+                    class="download" id="calcStorageBtn">Calculate storage impact</button>
+                <div id="calcStorageOutput" class="restorestatus"></div>
+            </div>
+        </section>
+        <section id="settings" class="view" hidden>
+            <div class="sectiontitle">
+                <div><label>09 / PREFERENCES</label>
+                    <h2>Workspace settings</h2>
+                </div>
+            </div>
+            <div class="card settingsCard"><label><input type="checkbox" id="motionToggle" checked> Enable interface
+                    motion</label><label><input type="checkbox" id="confirmToggle" checked> Confirm before clearing
+                    local history</label>
+                <p class="fine">Preferences are saved in this browser only. Files are processed locally through the
+                    backend running on your machine.</p><button class="download" id="exportHistory">Export activity
+                    history (JSON)</button>
+            </div>
+        </section>
+        <section id="about" class="view" hidden>
+            <div class="sectiontitle">
+                <div><label>10 / PROJECT</label>
+                    <h2>About HuffmanX</h2>
+                </div>
+            </div>
+            <div class="card aboutCard">
+                <div class="kicker">LOSSLESS BY DESIGN</div>
+                <h2>Compression, made visible.</h2>
+                <p>HuffmanX is an educational, local-first file compression lab. It demonstrates classic lossless
+                    algorithms and verifies restored files with SHA-256.</p>
+                <div class="algoCards">
+                    <article class="card">
+                        <h3>Algorithms</h3>
+                        <p>Huffman, RLE, LZ77, LZW and DEFLATE.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Architecture</h3>
+                        <p>Vanilla HTML/CSS/JavaScript frontend with a Python FastAPI backend.</p>
+                    </article>
+                    <article class="card">
+                        <h3>Container</h3>
+                        <p>HFX is a custom archive format. It is not compatible with ZIP or other standard archive
+                            formats.</p>
+                    </article>
+                </div><a href="http://127.0.0.1:8000/docs" target="_blank">Open interactive API documentation ↗</a>
+            </div>
+        </section>
+        <footer><span>HUFFMANX v3.0 <i>·</i> LOSSLESS BY DESIGN</span><span>PROCESSING ON YOUR MACHINE <b>●</b></span>
+        </footer>
+    </main>
+    <script src="app.js"></script>
+</body>
+
+</html>
